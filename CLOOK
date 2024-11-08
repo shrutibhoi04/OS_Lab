@@ -1,0 +1,62 @@
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+void CLOOK(int requests[], int n, int head) {
+    int totalSeekTime = 0;
+
+    // Sort the requests array
+    sort(requests, requests + n);
+
+    int index = 0;
+    // Find the first request greater than or equal to head
+    while (index < n && requests[index] < head) {
+        index++;
+    }
+
+    cout << "C-LOOK Order: " << head;
+
+    // Service the requests to the right of the head
+    for (int i = index; i < n; i++) {
+        cout << " -> " << requests[i];
+        totalSeekTime += abs(head - requests[i]);
+        head = requests[i];
+    }
+
+    // Jump to the left-most request (circular movement)
+    if (index > 0) {
+        totalSeekTime += abs(head - requests[0]);
+        head = requests[0];
+        cout << " -> " << head;
+    }
+
+    // Service the remaining requests to the right of the starting position
+    for (int i = 1; i < index; i++) {
+        cout << " -> " << requests[i];
+        totalSeekTime += abs(head - requests[i]);
+        head = requests[i];
+    }
+
+    cout << "\nTotal Seek Time: " << totalSeekTime << endl;
+}
+
+int main() {
+    int n, head;
+    int requests[100]; // Assuming max 100 requests
+
+    cout << "Enter the number of requests: ";
+    cin >> n;
+    
+    cout << "Enter the requests: ";
+    for (int i = 0; i < n; i++) {
+        cin >> requests[i];
+    }
+
+    cout << "Enter the initial head position: ";
+    cin >> head;
+
+    CLOOK(requests, n, head);
+
+    return 0;
+}
