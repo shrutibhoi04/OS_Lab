@@ -1,0 +1,74 @@
+
+
+
+
+
+#include <iostream>
+using namespace std;
+
+void fcfsPageReplacement(int pages[], int n, int frames) {
+    int frame[frames];
+    int pagefaults = 0;
+    int index = 0;
+
+    // Initialize frames with -1 (indicating empty)
+    for (int i = 0; i < frames; i++) {
+        frame[i] = -1;
+    }
+
+    for (int i = 0; i < n; i++) {
+        bool found = false;
+
+        // Check if the page is already in one of the frames
+        for (int j = 0; j < frames; j++) {
+            if (frame[j] == pages[i]) {
+                found = true;
+                break;
+            }
+        }
+
+        // If the page is not found in frames, replace the page using FCFS
+        if (!found) {
+            frame[index] = pages[i]; // Replace the oldest page
+            index = (index + 1) % frames; // Move to the next frame
+            pagefaults++; // Increment page fault count
+        }
+
+        // Display the current state of frames
+        cout << "Frames: ";
+        for (int j = 0; j < frames; j++) {
+            if (frame[j] != -1) {
+                cout << frame[j] << " ";
+            } else {
+                cout << "- ";
+            }
+        }
+        cout << endl;
+    }
+
+    // Output the total number of page faults
+    cout << "\nTotal Number of Page Faults (FCFS): " << pagefaults << endl;
+}
+
+int main() {
+    int n, frames;
+
+    // Input the number of pages
+    cout << "\nEnter the number of pages: ";
+    cin >> n;
+
+    // Input the page sequence
+    int pages[n];
+    cout << "\nEnter the page sequence: ";
+    for (int i = 0; i < n; i++) {
+        cin >> pages[i];
+    }
+
+    // Input the number of frames
+    cout << "\nEnter the number of frames: ";
+    cin >> frames;
+
+    fcfsPageReplacement(pages, n, frames);
+
+    return 0;
+}
