@@ -1,0 +1,104 @@
+
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int predict(int pages[], int frame[], int frames, int index, int n) {
+    int farthest = index, pos = -1;
+
+    for (int i = 0; i < frames; i++) {
+        int j;
+        for (j = index; j < n; j++) {
+            if (frame[i] == pages[j]) {
+                if (j > farthest) {
+                    farthest = j;
+                    pos = i;
+                }
+                break;
+            }
+        }
+        if (j == n) // Page not used again
+            return i;
+    }
+    return (pos == -1) ? 0 : pos;
+}
+
+void optimalPageReplacement(int pages[], int n, int frames) {
+    int frame[frames];
+    int pagefaults = 0;
+
+    // Initialize frames to -1 to indicate they are empty
+    for (int i = 0; i < frames; i++) {
+        frame[i] = -1;
+    }
+
+    for (int i = 0; i < n; i++) {
+        bool found = false;
+
+        // Check if the page is already in the frames
+        for (int j = 0; j < frames; j++) {
+            if (frame[j] == pages[i]) {
+                found = true;
+                break;
+            }
+        }
+
+        // If page is not found in frames
+        if (!found) {
+            // If there's space in frames
+            bool emptyFrame = false;
+            for (int j = 0; j < frames; j++) {
+                if (frame[j] == -1) {
+                    frame[j] = pages[i];
+                    pagefaults++;
+                    emptyFrame = true;
+                    break;
+                }
+            }
+
+            // If no empty frame, replace the optimal page
+            if (!emptyFrame) {
+                int pos = predict(pages, frame, frames, i + 1, n);
+                frame[pos] = pages[i];
+                pagefaults++;
+            }
+        }
+
+        // Display the current state of frames
+        cout << "Frames: ";
+        for (int j = 0; j < frames; j++) {
+            if (frame[j] != -1) {
+                cout << frame[j] << " ";
+            } else {
+                cout << "- ";
+            }
+        }
+        cout << endl;
+    }
+
+    // Output the total number of page faults
+    cout << "\nTotal Number of Page Faults (Optimal): " << pagefaults << endl;
+}
+
+int main() {
+    int n, frames;
+
+    // Input the number of pages
+    cout << "\nEnter the number of pages: ";
+    cin >> n;
+
+    // Input the page sequence
+    int pages[n];
+    cout << "\nEnter the page sequence: ";
+    for (int i = 0; i < n; i++) {
+        cin >> pages[i];
+    }
+
+    // Input the number of frames
+    cout << "\nEnter the number of frames: ";
+    cin >> frames;
+
+    optimalPageReplacement(pages, n, frames);
+
+    return 0;
+}
