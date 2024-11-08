@@ -1,0 +1,99 @@
+
+#include <iostream>
+using namespace std;
+
+int findLRU(int time[],int n){
+    int min_time = time[0], pos = 0;
+    for(int i=0; i<n; i++){
+        if(time[i] < min_time){
+            min_time = time[i];
+            pos = i;
+        }
+    }
+    return pos;
+}
+
+//LRU Page Replacement Algorithm
+
+void lruPageRepplacement (int pages[] , int n, int frames){
+    int frame[frames] , time[frames];
+    int count = 0 , pagefaults = 0;
+    
+    //initialize the frames and time arrays
+    for(int i=0; i<n; i++){
+        frame[i] = -1;
+        time[i] = 0;
+    }
+    
+    //iterate all the pages
+    for(int i=0; i<n; i++){
+        bool found = false;
+        
+        //If a page is already present in the frames which has occured
+        for(int j=0; j<frames; j++){
+            if(frame[j] == pages[i]){
+                found = true;
+                time[j] = ++count; //we updated the time as the page occured again 
+                break;
+            }
+        }
+        
+        //If there is an empty frame and the occured page in not found in the frames
+        if(!found){
+            for(int j=0; j<frames; j++){
+                if(frame[j] == -1){ //if frame is empty
+                    frame[j] = pages[i]; // page is allocated
+                    time[j] = ++count; //time of that page is updated
+                    pagefaults++;   //we allocated the page so there occurs a pagefault 
+                    found = true;  //so we placed the page successfully so marked found as TRUE
+                    break; 
+                }
+            }
+            
+            //If there is no empty frame in the frames array then replace the least recently used page
+            if(!found){
+                int lru = findLRU(time , frames); //we used the findLRU function to find the position of least recently used page in the frames
+                frame[lru] = pages[i]; //then we replaced the least recently used page with the newly occured one 
+                time[lru] = ++count;  // then we updated the time for newly added page
+                pagefaults++; //as we inserted the new page in frames then it produced a pagefault
+            }
+        }
+        
+        //Display the current state of frames
+        cout<<"Frames: ";
+        for(int j=0; j<frames; j++){
+            if(frame[j] != -1){
+                cout<<frame[j]<<" ";
+            }
+            else
+                cout<<"-";
+        }
+        cout<<endl;
+    }
+    //output the total number of page pagefaults
+    cout<<"\nTotal Number of Page Faults : "<<pagefaults<<endl;
+}
+
+//main function
+int main(){
+    int n , frames;
+    
+    //input the number of pages
+    cout<<"\nEnter the number of pages : ";
+    cin>>n;
+    
+    //input the page sequence
+    int pages[n];
+    cout<<"\nEnter the page sequence : ";
+    for(int i=0; i<n; i++){
+        cin>>pages[i];
+    }
+    
+    //input the number of frames
+    cout<<"\nEnter the number of frames: ";
+    cin>>frames;
+    
+    lruPageRepplacement(pages , n , frames);
+    
+    return 0;
+}
