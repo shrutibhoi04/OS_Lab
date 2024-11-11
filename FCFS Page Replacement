@@ -1,74 +1,62 @@
+#include <stdio.h>
+#include <limits.h>
 
+#define MAX_FRAMES 10
+#define MAX_PAGES 30
 
+int pages[MAX_PAGES], frames[MAX_FRAMES], n, fsize;
 
-
-
-#include <iostream>
-using namespace std;
-
-void fcfsPageReplacement(int pages[], int n, int frames) {
-    int frame[frames];
-    int pagefaults = 0;
-    int index = 0;
-
-    // Initialize frames with -1 (indicating empty)
-    for (int i = 0; i < frames; i++) {
-        frame[i] = -1;
-    }
-
-    for (int i = 0; i < n; i++) {
-        bool found = false;
-
-        // Check if the page is already in one of the frames
-        for (int j = 0; j < frames; j++) {
-            if (frame[j] == pages[i]) {
-                found = true;
-                break;
-            }
-        }
-
-        // If the page is not found in frames, replace the page using FCFS
-        if (!found) {
-            frame[index] = pages[i]; // Replace the oldest page
-            index = (index + 1) % frames; // Move to the next frame
-            pagefaults++; // Increment page fault count
-        }
-
-        // Display the current state of frames
-        cout << "Frames: ";
-        for (int j = 0; j < frames; j++) {
-            if (frame[j] != -1) {
-                cout << frame[j] << " ";
-            } else {
-                cout << "- ";
-            }
-        }
-        cout << endl;
-    }
-
-    // Output the total number of page faults
-    cout << "\nTotal Number of Page Faults (FCFS): " << pagefaults << endl;
+// Function to check if a page is in frames
+int isPageInFrames(int page) {
+    for (int i = 0; i < fsize; i++)
+        if (frames[i] == page) return 1;
+    return 0;
 }
 
-int main() {
-    int n, frames;
-
-    // Input the number of pages
-    cout << "\nEnter the number of pages: ";
-    cin >> n;
-
-    // Input the page sequence
-    int pages[n];
-    cout << "\nEnter the page sequence: ";
-    for (int i = 0; i < n; i++) {
-        cin >> pages[i];
+// Function to display frames
+void displayFrames() {
+    printf("Frames: ");
+    for (int i = 0; i < fsize; i++) {
+        if (frames[i] == -1) printf("- ");
+        else printf("%d ", frames[i]);
     }
+    printf("\n");
+}
 
-    // Input the number of frames
-    cout << "\nEnter the number of frames: ";
-    cin >> frames;
+// FIFO Page Replacement
+void FIFO() {
+    int page_faults = 0, next_replace = 0;
+    for (int i = 0; i < n; i++) {
+        if (!isPageInFrames(pages[i])) { // Page fault occurs
+            frames[next_replace] = pages[i];
+            next_replace = (next_replace + 1) % fsize; // FIFO rotation
+            page_faults++;
+            printf("Page fault at page %d: ", pages[i]);
+            displayFrames();
+        }
+    }
+    printf("FIFO Page Faults: %d\n", page_faults);
+}
 
-    fcfsPageReplacement(pages, n, frames);
+
+int main() {
+    int choice;
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+    printf("Enter page reference string: ");
+    for (int i = 0; i < n; i++) scanf("%d", &pages[i]);
+    printf("Enter number of frames: ");
+    scanf("%d", &fsize);
+
+    printf("Choose Page Replacement Algorithm:\n1. FIFO\n2. LRU\n3. Optimal\n");
+    scanf("%d", &choice);
+
+    for (int i = 0; i < fsize; i++) frames[i] = -1; // Initialize frames
+
+    switch (choice) {
+        case 1: FIFO(); break;
+        default: printf("Invalid choice!\n"); break;
+    }
 
     return 0;
 }
